@@ -1,0 +1,227 @@
+1. What is Docker?
+Docker is an open‑source containerization platform used to build, package, ship, and run applications in isolated environments called containers.
+Docker ensures that an application runs consistently across different environments (development, testing, staging, production).
+
+2. Why Docker is Used
+Before Docker:
+
+Application works on one machine but fails on another
+Dependency and version conflicts
+Heavy virtual machines
+Slow deployments
+
+With Docker:
+
+Portable applications
+Faster deployments
+Consistent runtime environments
+Efficient resource usage
+Easy integration with CI/CD pipelines
+
+
+3. Docker vs Virtual Machines
+Docker containers:
+
+Share the host OS kernel
+Lightweight
+Start in seconds
+High performance
+
+Virtual Machines:
+
+Run their own OS
+Heavy and slow
+Consume more resources
+
+Docker is not a VM.
+
+4. Core Docker Components
+Docker Engine
+The core service that runs Docker containers.
+Includes:
+
+Docker Daemon
+Docker CLI
+REST API
+
+
+Docker Image
+
+A read‑only template
+Built from Dockerfile
+Contains application code and dependencies
+
+Example:
+nginx:latest
+node:18
+
+
+Docker Container
+
+A running instance of a Docker image
+Isolated from other containers
+Can be started, stopped, deleted
+
+
+Dockerfile
+
+A text file with instructions to build an image
+Acts as a blueprint
+
+
+Docker Registry
+
+Stores Docker images
+Examples:
+
+Docker Hub
+AWS ECR
+GCP Artifact Registry
+
+
+
+
+5. Docker Architecture
+User → Docker CLI → Docker Daemon → Images / Containers → Registry
+
+
+6. Docker Lifecycle
+Dockerfile → Image → Container → Running Application
+
+
+7. Dockerfile Example (Node.js App)
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+
+
+8. Docker Basic Commands
+Check Docker
+docker --version
+docker info
+
+
+Image Commands
+docker images
+docker pull nginx
+docker build -t app:latest .
+docker rmi <image_id>
+
+
+Container Commands
+docker run app
+docker run -d app
+docker run -it app /bin/bash
+docker run -p 3000:3000 app
+docker ps
+docker ps -a
+docker stop <container_id>
+docker start <container_id>
+docker restart <container_id>
+docker rm <container_id>
+
+
+Logs & Debugging
+docker logs <container_id>
+docker exec -it <container_id> /bin/bash
+docker inspect <container_id>
+
+
+9. Environment Variables & Volumes
+Environment Variables
+docker run -e ENV=prod app
+docker run --env-file .env app
+
+Volumes
+docker run -v /host/data:/container/data app
+
+
+10. Docker Networking
+Types:
+
+bridge (default)
+host
+overlay (Kubernetes)
+
+Commands:
+docker network ls
+docker network create app-network
+docker run --network app-network app
+
+
+11. Docker Registry Commands (Docker Hub)
+docker login
+docker tag app user/app:latest
+docker push user/app:latest
+docker pull user/app:latest
+docker logout
+
+
+12. Docker Cleanup Commands (Very Important)
+docker system df
+docker system prune
+docker container prune
+docker image prune
+docker volume prune
+docker stats
+
+
+13. Docker Compose (Basics)
+Used for multi‑container applications.
+Commands:
+docker-compose up -d
+docker-compose down
+docker-compose ps
+docker-compose logs
+
+
+14. Docker in CI/CD (Real Usage)
+Typical pipeline steps:
+
+Build image
+Scan image
+Push image
+Deploy container
+
+Example:
+docker build -t myapp .
+docker push myapp
+docker run myapp
+
+In Jenkins:
+withDockerRegistry(credentialsId: 'docker-cred') {
+  sh 'docker build -t user/app .'
+  sh 'docker push user/app'
+}
+
+
+15. Docker + Kubernetes
+
+Docker builds containers
+Kubernetes manages containers
+
+Docker handles:
+
+Image creation
+Container runtime
+
+Kubernetes handles:
+
+Scaling
+Self‑healing
+Load balancing
+Rolling updates
+
+
+16. Advantages of Docker
+
+Portability
+Scalability
+Faster deployments
+Easy rollback
+Version control for environments
+Strong DevOps support
