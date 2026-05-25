@@ -19,3 +19,152 @@ ENV : used top pass the variables - these vars will be available inside the cont
 WORKDIR : used to set a default path for our container
 RUN : used to execute the commands
 EXPOSE : used to expose the port number
+
+
+---------------- DOCKERFILE COMPONENTS ----------------
+
+1. FROM
+- Definition: Defines the base image
+- Example: FROM node:18
+- Note: MUST be first instruction
+
+-----------------------------------------------------
+
+2. WORKDIR
+- Definition: Sets working directory inside container
+- Example: WORKDIR /app
+
+-----------------------------------------------------
+
+3. COPY
+- Definition: Copies files from host to container
+- Example: COPY app.js .
+- Best practice: Prefer COPY over ADD
+
+-----------------------------------------------------
+
+4. ADD
+- Definition: Copies + can extract files or fetch URLs
+- Example: ADD file.tar.gz .
+- Difference: ADD > COPY (extra features)
+- Use case: Rarely used
+
+-----------------------------------------------------
+
+5. RUN
+- Definition: Executes command during build time
+- Example: RUN npm install
+- Use: install packages, setup system
+
+-----------------------------------------------------
+
+6. CMD
+- Definition: Runs command when container starts
+- Example: CMD ["node", "app.js"]
+- Rule: Only ONE CMD allowed
+
+-----------------------------------------------------
+
+7. ENTRYPOINT
+- Definition: Defines fixed executable
+- Example: ENTRYPOINT ["node"]
+- Difference from CMD:
+  CMD → default command (can override)
+  ENTRYPOINT → fixed command (hard to override)
+
+-----------------------------------------------------
+
+8. EXPOSE
+- Definition: Documents port container uses
+- Example: EXPOSE 3000
+- Note: Does NOT open port automatically
+
+-----------------------------------------------------
+
+9. ENV
+- Definition: Sets environment variables
+- Example: ENV NODE_ENV=production
+- Available at runtime ✅
+
+-----------------------------------------------------
+
+10. ARG
+- Definition: Build-time variables
+- Example: ARG VERSION=1
+- Note: NOT available after container starts ❗
+
+-----------------------------------------------------
+
+11. VOLUME
+- Definition: Creates mount point for data
+- Example: VOLUME /data
+- Use: persistent storage
+
+-----------------------------------------------------
+
+12. USER
+- Definition: Sets user for running container
+- Example: USER node
+- Use: security (avoid root)
+
+-----------------------------------------------------
+
+13. LABEL
+- Definition: Adds metadata to image
+- Example: LABEL version="1.0"
+
+-----------------------------------------------------
+
+14. HEALTHCHECK
+- Definition: Checks container health
+- Example:
+  HEALTHCHECK CMD curl -f http://localhost:3000 || exit 1
+
+-----------------------------------------------------
+
+15. ONBUILD (Advanced)
+- Definition: Runs instruction when image is used as base
+
+-----------------------------------------------------
+
+---------------- IMPORTANT DIFFERENCES ----------------
+
+RUN vs CMD:
+RUN  → executes during build ✅
+CMD  → runs when container starts ✅
+
+CMD vs ENTRYPOINT:
+CMD → default command ✅ (can override)
+ENTRYPOINT → fixed command ✅ (hard to override)
+
+COPY vs ADD:
+COPY → simple file copy ✅ (preferred)
+ADD → copy + extract/download ❌ (avoid unless needed)
+
+ENV vs ARG:
+ENV → available at runtime ✅
+ARG → only during build ❌
+
+-----------------------------------------------------
+
+---------------- STANDARD Dockerfile STRUCTURE --------
+
+FROM base-image
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node","app.js"]
+
+-----------------------------------------------------
+
+---------------- ONE LINE MEMORY ----------------
+
+FROM → base  
+WORKDIR → location  
+COPY → files  
+RUN → install  
+CMD → run  
+
+-----------------------------------------------------
