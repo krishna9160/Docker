@@ -1,0 +1,199 @@
+======================== DOCKER SWARM NOTES ========================
+
+---------------------------------- DEFINITION ----------------------------------
+
+Docker Swarm is a built-in container orchestration tool in Docker used to
+manage and run containers across multiple machines (nodes) as a cluster.
+
+-------------------------------------------------------------------------------
+
+------------------------------- WHAT IT DOES -----------------------------------
+
+- Creates cluster of multiple nodes ✅
+- Manages container deployment ✅
+- Supports scaling (replicas) ✅
+- Provides load balancing ✅
+- Ensures high availability ✅
+- Automatically replaces failed containers ✅
+
+-------------------------------------------------------------------------------
+
+-------------------------------- ARCHITECTURE ----------------------------------
+
+Swarm Cluster consists of:
+
+1. Manager Node:
+- Controls entire cluster ✅
+- Schedules containers ✅
+
+2. Worker Node:
+- Runs containers ✅
+- Executes tasks from manager ✅
+
+-------------------------------------------------------------------------------
+
+------------------------------- KEY CONCEPTS -----------------------------------
+
+1. Node:
+- Machine (EC2 instance)
+- Can be Manager or Worker
+
+2. Service:
+- Defines application
+- Maintains desired state (replicas)
+
+3. Task:
+- A running container inside a service
+
+4. Cluster:
+- Group of nodes managed together
+
+5. Overlay Network:
+- Enables communication between nodes
+
+-------------------------------------------------------------------------------
+
+--------------------------- IMPORTANT BEHAVIOR ---------------------------------
+
+- Swarm distributes containers across nodes ✅
+- Load balancing is automatic ✅
+- Self-healing: failed containers restarted ✅
+- Existing containers are NOT rebalanced automatically ❗
+- All nodes MUST have access to the image ✅
+
+-------------------------------------------------------------------------------
+
+--------------------------------- COMMANDS -------------------------------------
+
+Initialize swarm (manager):
+docker swarm init
+
+Leave swarm:
+docker swarm leave --force
+
+Get worker join token:
+docker swarm join-token worker
+
+Get manager join token:
+docker swarm join-token manager
+
+Join worker node:
+docker swarm join --token <token> <manager-ip>:2377
+
+-------------------------------------------------------------------------------
+
+-------------------------------- NODE COMMANDS ---------------------------------
+
+List all nodes (manager only):
+docker node ls
+
+Inspect node:
+docker node inspect <node-id>
+
+Change node availability:
+docker node update --availability active <node-id>
+
+-------------------------------------------------------------------------------
+
+------------------------------ SERVICE COMMANDS --------------------------------
+
+Create service:
+docker service create --name myservice -p 3000:3000 myimage
+
+Create with replicas:
+docker service create --name myservice --replicas 3 myimage
+
+List services:
+docker service ls
+
+View service details:
+docker service ps myservice
+
+Scale service:
+docker service scale myservice=5
+
+Remove service:
+docker service rm myservice
+
+-------------------------------------------------------------------------------
+
+------------------------------ CONTAINER VIEW ----------------------------------
+
+View containers on current node:
+docker ps
+
+From manager (see distribution):
+docker service ps myservice
+
+-------------------------------------------------------------------------------
+
+---------------------------- COMMON ISSUES -------------------------------------
+
+1. Containers only run on manager:
+- Worker not active OR
+- Image not available on worker
+
+2. "No such image" error:
+- Image not present on worker node ❗
+- Fix: push image to Docker Hub ✅
+
+3. Join failed:
+- Port 2377 blocked ❗
+- Use correct IP + open ports ✅
+
+-------------------------------------------------------------------------------
+
+---------------------------- REQUIRED PORTS ------------------------------------
+
+2377 → cluster management ✅
+7946 → node communication ✅ (TCP + UDP)
+4789 → overlay networking ✅ (UDP)
+
+-------------------------------------------------------------------------------
+
+----------------------------- COMPLETE FLOW ------------------------------------
+
+1. Install Docker on all nodes ✅
+2. Initialize swarm on manager ✅
+3. Join worker nodes ✅
+4. Create service ✅
+5. Scale replicas ✅
+6. Swarm distributes containers ✅
+
+-------------------------------------------------------------------------------
+
+----------------------------- EXAMPLE FLOW -------------------------------------
+
+docker swarm init
+
+docker swarm join --token <token> <manager-ip>:2377
+
+docker service create --name myservice --replicas 3 myapp:v1
+
+docker service ps myservice
+
+docker service scale myservice=5
+
+-------------------------------------------------------------------------------
+
+------------------------------- ONE LINE MEMORY --------------------------------
+
+Swarm = Docker + clustering + scaling ✅
+
+-------------------------------------------------------------------------------
+
+-------------------------- COMPOSE vs SWARM ------------------------------------
+
+Docker Compose:
+- Single machine ✅
+- Local development ✅
+- No clustering ❌
+
+Docker Swarm:
+- Multiple nodes ✅
+- Production capable ✅
+- Scaling + load balancing ✅
+
+-------------------------------------------------------------------------------
+
+===============================================================================
