@@ -1,0 +1,276 @@
+======================== DOCKER COMPOSE COMPLETE NOTES ========================
+
+---------------------------------- DEFINITION ----------------------------------
+
+Docker Compose is a tool used to define and run multi-container Docker applications
+using a YAML file.
+
+-------------------------------------------------------------------------------
+
+------------------------------- WHAT IT DOES -----------------------------------
+
+- Runs multiple containers together ✅
+- Builds images using Dockerfile ✅
+- Creates network automatically ✅
+- Connects containers using service names ✅
+- Starts everything with one command ✅
+
+-------------------------------------------------------------------------------
+
+------------------------------ BASIC STRUCTURE ---------------------------------
+
+version: "3"
+
+services:
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+-------------------------------------------------------------------------------
+
+-------------------------------- KEY CONCEPTS ----------------------------------
+
+1. services:
+- Defines containers
+- Each service = one container
+
+2. build:
+- Builds image from Dockerfile
+
+3. image:
+- Uses existing image from Docker Hub
+
+4. ports:
+- Maps container port to host
+- Example: "3000:3000" (host:container)
+
+5. environment:
+- Defines environment variables inside container
+
+6. depends_on:
+- Controls startup order ✅
+- Does NOT wait for service readiness ❌
+
+7. volumes:
+- Used to persist data
+- Example: database storage
+
+8. networks:
+- Automatically created
+- Enables inter-container communication
+
+-------------------------------------------------------------------------------
+
+----------------------------- IMPORTANT BEHAVIOR -------------------------------
+
+- Containers communicate using SERVICE NAME ✅
+  Example:
+    host = "db" ✅
+    NOT "localhost" ❌
+
+- Docker Compose builds image only once ✅
+  If code changes → must use:
+    docker-compose up -d --build ✅
+
+-------------------------------------------------------------------------------
+
+---------------------------------- COMMANDS ------------------------------------
+
+Start containers:
+docker-compose up
+
+Run in background:
+docker-compose up -d
+
+Rebuild and run:
+docker-compose up -d --build
+
+Stop containers:
+docker-compose down
+
+View logs:
+docker-compose logs
+
+Restart service:
+docker-compose restart
+
+List containers:
+docker-compose ps
+
+-------------------------------------------------------------------------------
+
+-------------------------------- DEBUG FLOW ------------------------------------
+
+1. docker-compose ps
+2. docker logs <container>
+3. check file names
+4. rebuild (--build)
+
+-------------------------------------------------------------------------------
+
+========================= COMPOSE vs SWARM vs KUBERNETES =======================
+
+-------------------------------- DOCKER COMPOSE --------------------------------
+
+- Scope: Single machine ✅
+- Use: Local development, testing ✅
+- Runs: Multiple containers ✅
+- Scaling: Limited ❌
+
+-------------------------------------------------------------------------------
+
+-------------------------------- DOCKER SWARM ----------------------------------
+
+- Scope: Multiple machines (cluster) ✅
+- Built into Docker ✅
+- Features:
+  - Scaling ✅
+  - Load balancing ✅
+  - Self-healing ✅
+- Use: Small production setups
+
+-------------------------------------------------------------------------------
+
+-------------------------------- KUBERNETES ------------------------------------
+
+- Scope: Large clusters ✅
+- Industry standard ✅
+- Features:
+  - Auto-scaling ✅
+  - Rolling updates ✅
+  - Self-healing ✅
+  - Networking (Service) ✅
+  - Storage (PVC) ✅
+- Use: Large-scale production apps
+
+-------------------------------------------------------------------------------
+
+-------------------------------- KEY DIFFERENCE --------------------------------
+
+Compose → local multi-container ✅
+Swarm → Docker cluster ✅
+Kubernetes → full orchestration ✅
+
+-------------------------------------------------------------------------------
+
+-------------------------------- MAPPING ---------------------------------------
+
+Docker Compose Service → Kubernetes Pod / Deployment ✅
+Kubernetes Service → Networking layer ✅
+
+-------------------------------------------------------------------------------
+
+------------------------------- ONE LINE MEMORY --------------------------------
+
+Compose = local ✅
+Swarm = cluster ✅
+Kubernetes = production orchestration ✅
+
+===============================================================================
+
+=========================== APPLICATION FILES ==================================
+
+-------------------------------- myapp.js --------------------------------------
+
+const http = require("http");
+const mysql = require("mysql");
+
+// create DB connection
+const db = mysql.createConnection({
+  host: "db",  // service name
+  user: "root",
+  password: "root",
+  database: "testdb",
+});
+
+// retry connection if DB not ready
+function connectDB() {
+  db.connect((err) => {
+    if (err) {
+      console.log("DB not ready, retrying...");
+      setTimeout(connectDB, 5000);
+    } else {
+      console.log("Connected to MySQL ✅");
+    }
+  });
+}
+
+connectDB();
+
+const server = http.createServer((req, res) => {
+  res.end("App connected to DB 🚀");
+});
+
+server.listen(3000, () => {
+  console.log("Server running on port 3000");
+});
+
+-------------------------------------------------------------------------------
+
+------------------------------- package.json -----------------------------------
+
+{
+  "name": "compose-app",
+  "version": "1.0.0",
+  "main": "myapp.js",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
+
+-------------------------------------------------------------------------------
+
+-------------------------------- Dockerfile ------------------------------------
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json .
+RUN npm install
+
+COPY myapp.js .
+
+EXPOSE 3000
+
+CMD ["node", "myapp.js"]
+
+-------------------------------------------------------------------------------
+
+----------------------------- docker-compose.yml -------------------------------
+
+version: "3"
+
+services:
+
+  app:
+    build: .
+    container_name: node-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:5.7
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:
+
+===============================================================================
